@@ -22,8 +22,16 @@ pub struct Gather<S, C, R, Q> {
 }
 
 impl<S: Store, C: Clock, R: Tokens, Q: cthl::Store> Gather<S, C, R, Q> {
-    pub fn new(presence: Switchboard<S, C, R>, throttle: cthl::Throttle<Q>, rooms: cmbl::Assembly<S>) -> Self {
-        Self { presence, throttle, rooms }
+    pub fn new(
+        presence: Switchboard<S, C, R>,
+        throttle: cthl::Throttle<Q>,
+        rooms: cmbl::Assembly<S>,
+    ) -> Self {
+        Self {
+            presence,
+            throttle,
+            rooms,
+        }
     }
 
     /// Cheap configured quotas precede the caller's expensive verification.
@@ -85,8 +93,17 @@ impl<S: Store, C: Clock, R: Tokens, Q: cthl::Store> Gather<S, C, R, Q> {
 
     /// Assembly alone checks the anonymous permit, bounds and ordering.
     /// This does not link a room operation to a presence member or device.
-    pub async fn room(&self, request: &cmbl::Request, proof: &[u8], verifier: &dyn cmbl::ProofVerifier, now: u64) -> Result<cmbl::Outcome, Error> {
-        self.rooms.execute(request, proof, verifier, now).await.map_err(Error::Rooms)
+    pub async fn room(
+        &self,
+        request: &cmbl::Request,
+        proof: &[u8],
+        verifier: &dyn cmbl::ProofVerifier,
+        now: u64,
+    ) -> Result<cmbl::Outcome, Error> {
+        self.rooms
+            .execute(request, proof, verifier, now)
+            .await
+            .map_err(Error::Rooms)
     }
 
     pub fn room_handover(&self, proof: &[u8]) -> Result<(), Error> {

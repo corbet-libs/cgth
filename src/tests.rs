@@ -51,9 +51,19 @@ async fn real_quota_and_volatile_children_remain_the_owners() {
         cthl::MemoryStore::new(NonZeroUsize::new(10).unwrap()),
     )
     .unwrap();
-    let rooms = cmbl::Assembly::new(storage.clone(),"community".into(),"boot".into(), cmbl::Limits {
-        connections:4,relay_messages:4,message_bytes:100,lifetime_ms:100,proof_bytes:100,
-    }).unwrap();
+    let rooms = cmbl::Assembly::new(
+        storage.clone(),
+        "community".into(),
+        "boot".into(),
+        cmbl::Limits {
+            connections: 4,
+            relay_messages: 4,
+            message_bytes: 100,
+            lifetime_ms: 100,
+            proof_bytes: 100,
+        },
+    )
+    .unwrap();
     let gather = Gather::new(presence, throttle, rooms);
     assert_eq!(
         gather.preflight(b"opaque-client", "challenge").await,
@@ -77,10 +87,27 @@ async fn real_quota_and_volatile_children_remain_the_owners() {
         gather.expire().await,
         Err(Error::Presence(cswb::Error::Storage(cmmr::Error::Closed)))
     );
-    fn send<T: Send>(future: T) -> T { future }
-    let mut request=cmbl::Request {room:[1;16],operation:[2;16],action:cmbl::Action::Connect{connection:[3;16]}};
-    assert_eq!(send(gather.room(&request,b"proof",&cmbl::UnavailableProofs,100)).await, Err(Error::Rooms(cmbl::Error::ProofUnavailable)));
-    request.operation=[0;16];
-    assert_eq!(send(gather.room(&request,b"proof",&cmbl::UnavailableProofs,100)).await, Err(Error::Rooms(cmbl::Error::Invalid)));
-    assert_eq!(gather.room_handover(b"proof"), Err(Error::Rooms(cmbl::Error::ProofUnavailable)));
+    fn send<T: Send>(future: T) -> T {
+        future
+    }
+    let mut request = cmbl::Request {
+        room: [1; 16],
+        operation: [2; 16],
+        action: cmbl::Action::Connect {
+            connection: [3; 16],
+        },
+    };
+    assert_eq!(
+        send(gather.room(&request, b"proof", &cmbl::UnavailableProofs, 100)).await,
+        Err(Error::Rooms(cmbl::Error::ProofUnavailable))
+    );
+    request.operation = [0; 16];
+    assert_eq!(
+        send(gather.room(&request, b"proof", &cmbl::UnavailableProofs, 100)).await,
+        Err(Error::Rooms(cmbl::Error::Invalid))
+    );
+    assert_eq!(
+        gather.room_handover(b"proof"),
+        Err(Error::Rooms(cmbl::Error::ProofUnavailable))
+    );
 }
