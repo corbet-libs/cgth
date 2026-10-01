@@ -77,9 +77,10 @@ async fn real_quota_and_volatile_children_remain_the_owners() {
         gather.expire().await,
         Err(Error::Presence(cswb::Error::Storage(cmmr::Error::Closed)))
     );
+    fn send<T: Send>(future: T) -> T { future }
     let mut request=cmbl::Request {room:[1;16],operation:[2;16],action:cmbl::Action::Connect{connection:[3;16]}};
-    assert_eq!(gather.room(&request,b"proof",&cmbl::UnavailableProofs,100).await, Err(Error::Rooms(cmbl::Error::ProofUnavailable)));
+    assert_eq!(send(gather.room(&request,b"proof",&cmbl::UnavailableProofs,100)).await, Err(Error::Rooms(cmbl::Error::ProofUnavailable)));
     request.operation=[0;16];
-    assert_eq!(gather.room(&request,b"proof",&cmbl::UnavailableProofs,100).await, Err(Error::Rooms(cmbl::Error::Invalid)));
+    assert_eq!(send(gather.room(&request,b"proof",&cmbl::UnavailableProofs,100)).await, Err(Error::Rooms(cmbl::Error::Invalid)));
     assert_eq!(gather.room_handover(b"proof"), Err(Error::Rooms(cmbl::Error::ProofUnavailable)));
 }
