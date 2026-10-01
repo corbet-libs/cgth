@@ -1,0 +1,7 @@
+[package]
+name = "cgth"
+version = "0.1.0"
+edition = "2024"
+description = "Gather for the volatile forum"
+repository = "https://github.com/corbet-libs/cgth"
+license-file = "LICENSE.md"
