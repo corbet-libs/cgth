@@ -1,7 +1,7 @@
 name: ci
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.repository }}
+  cancel-in-progress: false
 permissions:
   contents: read
 jobs:
@@ -51,7 +51,7 @@ jobs:
     - name: Check formatting and retain a repair patch
       run: 'cargo fmt --all
 
-        git diff --exit-code > format.patch'
+        git diff --exit-code -- ''*.rs'' > format.patch'
       continue-on-error: false
     - uses: actions/upload-artifact@v4
       if: failure()
@@ -130,7 +130,8 @@ jobs:
 'on':
   push:
     branches:
-    - '**'
+    - main
+    - candidate/**
   pull_request: null
   workflow_dispatch: null
 env:
