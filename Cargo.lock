@@ -266,7 +266,7 @@ dependencies = [
 [[package]]
 name = "cmmr"
 version = "0.1.0"
-source = "git+https://github.com/corbet-foss/cmmr?branch=main#e0fb6462daa05aded923126d3d9006314a5ec436"
+source = "git+https://github.com/corbet-foss/cmmr?branch=main#9fbc6bc78cfcb7c6190cfe9079dce21c288e7b1f"
 dependencies = [
  "serde",
 ]
