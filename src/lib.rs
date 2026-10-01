@@ -11,18 +11,19 @@ pub enum Error {
     QuotaUnavailable,
     QuotaExceeded,
     Presence(cswb::Error),
-    RoomsUnavailable,
+    Rooms(cmbl::Error),
 }
 
 /// Composition holds child handles only, never its own roster or matching state.
 pub struct Gather<S, C, R, Q> {
     presence: Switchboard<S, C, R>,
     throttle: cthl::Throttle<Q>,
+    rooms: cmbl::Assembly<S>,
 }
 
 impl<S: Store, C: Clock, R: Tokens, Q: cthl::Store> Gather<S, C, R, Q> {
-    pub fn new(presence: Switchboard<S, C, R>, throttle: cthl::Throttle<Q>) -> Self {
-        Self { presence, throttle }
+    pub fn new(presence: Switchboard<S, C, R>, throttle: cthl::Throttle<Q>, rooms: cmbl::Assembly<S>) -> Self {
+        Self { presence, throttle, rooms }
     }
 
     /// Cheap configured quotas precede the caller's expensive verification.
@@ -81,14 +82,16 @@ impl<S: Store, C: Clock, R: Tokens, Q: cthl::Store> Gather<S, C, R, Q> {
     pub async fn expire(&self) -> Result<usize, Error> {
         self.presence.expire().await.map_err(Error::Presence)
     }
-}
 
-/// Assembly's anonymous permits, ordering and restart recovery remain an owner
-/// integration boundary. No local roster, counter or substitute room protocol.
-pub enum RoomAuthority {}
+    /// Assembly alone checks the anonymous permit, bounds and ordering.
+    /// This does not link a room operation to a presence member or device.
+    pub async fn room(&self, request: &cmbl::Request, proof: &[u8], verifier: &dyn cmbl::ProofVerifier, now: u64) -> Result<cmbl::Outcome, Error> {
+        self.rooms.execute(request, proof, verifier, now).await.map_err(Error::Rooms)
+    }
 
-pub fn require_rooms() -> Result<RoomAuthority, Error> {
-    Err(Error::RoomsUnavailable)
+    pub fn room_handover(&self, proof: &[u8]) -> Result<(), Error> {
+        self.rooms.handover(proof).map_err(Error::Rooms)
+    }
 }
 
 #[cfg(test)]
