@@ -36,19 +36,42 @@ impl<S: Store, C: Clock, R: Tokens, Q: cthl::Store> Gather<S, C, R, Q> {
     }
 
     pub async fn enter(&self, admission: Admission) -> Result<(Session, Live), Error> {
-        self.presence.enter(admission).await.map_err(Error::Presence)
+        self.presence
+            .enter(admission)
+            .await
+            .map_err(Error::Presence)
     }
 
     pub async fn read(&self, session: &Session, current: &Current) -> Result<Live, Error> {
-        self.presence.read(session, current).await.map_err(Error::Presence)
+        self.presence
+            .read(session, current)
+            .await
+            .map_err(Error::Presence)
     }
 
-    pub async fn replace(&self, session: &Session, current: &Current, expected: Revision, admission: Admission) -> Result<Live, Error> {
-        self.presence.replace(session, current, expected, admission).await.map_err(Error::Presence)
+    pub async fn replace(
+        &self,
+        session: &Session,
+        current: &Current,
+        expected: Revision,
+        admission: Admission,
+    ) -> Result<Live, Error> {
+        self.presence
+            .replace(session, current, expected, admission)
+            .await
+            .map_err(Error::Presence)
     }
 
-    pub async fn heartbeat(&self, session: &Session, current: &Current, expected: Revision) -> Result<Live, Error> {
-        self.presence.heartbeat(session, current, expected).await.map_err(Error::Presence)
+    pub async fn heartbeat(
+        &self,
+        session: &Session,
+        current: &Current,
+        expected: Revision,
+    ) -> Result<Live, Error> {
+        self.presence
+            .heartbeat(session, current, expected)
+            .await
+            .map_err(Error::Presence)
     }
 
     pub async fn depart(&self, session: &Session) -> Result<usize, Error> {
