@@ -61,6 +61,7 @@ async fn real_quota_and_volatile_children_remain_the_owners() {
             message_bytes: 100,
             lifetime_ms: 100,
             proof_bytes: 100,
+            operation_receipts: 16,
         },
     )
     .unwrap();
